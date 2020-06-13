@@ -1,0 +1,40 @@
+Name,Type,Set
+Go,Special,None
+Old Kent Road,Property,Brown
+Community Chest,Special,Chest
+Whitechapel Road,Property,Brown
+Income Tax,Special,Tax
+King's Cross Station,Property,Station
+"The Angel, Islington",Property,Light blue
+Chance,Special,Chance
+Euston Road,Property,Light blue
+Pentonville Road,Property,Light blue
+Jail,Special,None
+Pall Mall,Property,Pink
+Whitehall,Property,Pink
+Northumberland Avenue,Property,Pink
+Community Chest,Special,Chest
+Marylebone Station,Property,Station
+Bow Street,Property,Orange
+Community Chest,Special,Chest
+Marlborough Street,Property,Orange
+Vine Street,Property,Orange
+Free Parking,Special,None
+Strand,Property,Red
+Chance,Special,Chance
+Fleet Street,Property,Red
+Trafalgar Square,Property,Red
+Fenchurch Street Station,Property,Station
+Leicester Square,Property,Yellow
+Coventry Street,Property,Yellow
+Piccadilly,Property,Yellow
+Go To Jail,Special,None
+Regent Street,Property,Green
+Oxford Street,Property,Green
+Community Chest,Special,Chest
+Bond Street,Property,Green
+Liverpool Street Station,Property,Station
+Chance,Special,Chance
+Park Lane,Property,Dark blue
+Super Tax,Special,Tax
+Mayfair,Property,Dark blue
