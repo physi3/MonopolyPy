@@ -1,2 +1,2 @@
 # MonopolyPy
-Joe is stinky.
+Olly is stinky.
