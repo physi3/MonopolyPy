@@ -1,22 +1,55 @@
-class Board:
-    def __init__(self):
-        self.size = 0
-        self.spaces = []
-        self.players = []
+from csv import reader as csvreader
 
+
+class Board:
+    def __init__(self, filepath="./boards/UK.board"):
+        # Loads spaces from board CSV.
+        spaces = []
+
+        with open(filepath, 'r') as boardfile:
+            reader = csvreader(boardfile)
+            header = [*map(str.lower, next(reader))]
+
+            # Expected values: name, type, set.
+            values = ("name", "type", "set")
+            order = [header.index(s) for s in values]
+            for row in reader:
+                # Keyword access to data.
+                row = {value: row[i] for value, i in zip(values, order)}
+                # Check the type of space.
+                space = None
+                t = row["type"].lower()
+                if t == "property":
+                    space = Property(row["name"], row["set"])
+                elif t == "special":
+                    space = Special(row["name"])
+                else:
+                    raise Exception(f"'{t}' is an invalid type! ({filepath})")
+
+                # Add the space to the board.
+                spaces.append(space)
+            self.spaces = spaces
+                
 
 class Space:
     name = ''
-    position = 0
 
 
 class Property(Space):
-    def __init__(self):
-        self.colour = ''
+    def __init__(self, name, colour):
+        self.name = name
+        self.set = colour
+    
+    def __repr__(self):
+        return f"<Property '{self.name}'>"
 
 
 class Special(Space):
-    pass
+    def __init__(self, name):
+        self.name = name
+    
+    def __repr__(self):
+        return f"<Special '{self.name}'>"
 
 
 class Player:

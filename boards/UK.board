@@ -4,17 +4,18 @@ Old Kent Road,Property,Brown
 Community Chest,Special,Chest
 Whitechapel Road,Property,Brown
 Income Tax,Special,Tax
-King's Cross Station,Property,Station
+King's Cross Station,Special,Station
 "The Angel, Islington",Property,Light blue
 Chance,Special,Chance
 Euston Road,Property,Light blue
 Pentonville Road,Property,Light blue
 Jail,Special,None
 Pall Mall,Property,Pink
+Electric Company,Special,Utility
 Whitehall,Property,Pink
 Northumberland Avenue,Property,Pink
 Community Chest,Special,Chest
-Marylebone Station,Property,Station
+Marylebone Station,Special,Station
 Bow Street,Property,Orange
 Community Chest,Special,Chest
 Marlborough Street,Property,Orange
@@ -24,16 +25,17 @@ Strand,Property,Red
 Chance,Special,Chance
 Fleet Street,Property,Red
 Trafalgar Square,Property,Red
-Fenchurch Street Station,Property,Station
+Fenchurch Street Station,Special,Station
 Leicester Square,Property,Yellow
 Coventry Street,Property,Yellow
+Water Works,Special,Utility
 Piccadilly,Property,Yellow
 Go To Jail,Special,None
 Regent Street,Property,Green
 Oxford Street,Property,Green
 Community Chest,Special,Chest
 Bond Street,Property,Green
-Liverpool Street Station,Property,Station
+Liverpool Street Station,Special,Station
 Chance,Special,Chance
 Park Lane,Property,Dark blue
 Super Tax,Special,Tax
