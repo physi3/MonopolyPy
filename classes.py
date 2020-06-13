@@ -35,6 +35,7 @@ class Board:
             # Add the space to the board.
             spaces.append(space)
         self.spaces = spaces
+        self.size = len(self.spaces)
 
         self.chances = []
         for i in chances:
@@ -115,7 +116,7 @@ class Player:
         self.position = position
 
 
-    def rollDice():
+    def rollDice(self):
         dice1 = randint(1,6)
         dice2 = randint(1,6)
         if dice1 == dice2:
@@ -123,4 +124,6 @@ class Player:
         return dice1+dice2
 
     def turn(self, board):
-        self.move(board,self.rollDice())
+        diceRoll = self.rollDice()
+        self.move(board,diceRoll)
+        print(diceRoll)
