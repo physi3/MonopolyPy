@@ -6,22 +6,22 @@ class Board:
 
 
 class Space:
-    def __init__(self):
-        self.name = ''
-        self.position = 0
+    name = ''
+    position = 0
 
 
 class Property(Space):
     def __init__(self):
-        self.colour = ""
+        self.colour = ''
 
 
 class Special(Space):
     pass
 
+
 class Player:
     def __init__(self):
-        self.name = ""
+        self.name = ''
         self.position = 0
         self.inJail = False
 
