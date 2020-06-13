@@ -1,1 +1,2 @@
 # MonopolyPy
+Joe is stinky.
