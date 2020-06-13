@@ -40,3 +40,35 @@ Chance,Special,Chance
 Park Lane,Property,Dark blue
 Super Tax,Special,Tax
 Mayfair,Property,Dark blue
+&Advance to "Go",Directly|Go
+Go to jail. Move directly to jail. Do not pass "Go". Do not collect £200,Jail
+Advance to Pall Mall. If you pass "Go" collection £200,Directly|Pall Mall
+Take a trip to Marylebone Station and if you pass "Go" collect £200,Directly|Marylebone Station
+Advance to Trafalgar Square. If you pass "Go" collect £200,Directly|Trafalgar Square
+Advance to Mayfair,Directly|Mayfair
+Go back three spaces,Move|-3
+Make general repairs on all of your houses. For each house pay £25. For each hotel pay £100,Repairs
+You are assessed for street repairs: £40 per house, £115 per hotel,Repairs
+Pay school fees of £150,Money|-150
+"Drunk in charge" fine £20,Money|-20
+Speeding fine £15,Money|-15
+Your building loan matures. Receive £150,Money|150
+You have won a crossword competition. Collect £100,Money|100
+Bank pays you dividend of £50,Money|100
+Get out of jail free. This card may be kept until needed or sold,JailFree
+&Advance to "Go",Directly|Go
+Go back to Old Kent Road,Directly|Old Kent Road
+Go to jail. Move directly to jail. Do not pass "Go". Do not collect £200,Jail
+Pay hospital £100,Money|-100
+Doctor's fee. Pay £50,Money|-50
+Pay your insurance premium £50,Money|-50
+Bank error in your favour. Collect £200,Money|200
+Annuity matures. Collect £100,Money|100
+You inherit £100,Money|100
+From sale of stock you get £50,Money|50
+Receive interest on 7% preference shares: £25,Money|25
+Income tax refund. Collect £20,Money|20
+You have won second prize in a beauty contest. Collect £10,Money|10
+It is your birthday. Collect £10 from each player,EachPlayer|10
+Get out of jail free. This card may be kept until needed or sold,JailFree
+Pay a £10 fine,Money|-10
