@@ -1,5 +1,5 @@
 from csv import reader as csvreader
-from random import randint
+from random import shuffle, randint
 from io import StringIO
 
 class Board:
@@ -40,10 +40,12 @@ class Board:
         self.chances = []
         for i in chances:
             self.chances.append(Card(i.split(',')[0],i.split(',')[1]))
+        shuffle(self.chances)
 
         self.community = []
         for i in community:
             self.community.append(Card(i.split(',')[0],i.split(',')[1]))
+        shuffle(self.community)
 
 
 class Card:
