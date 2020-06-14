@@ -22,7 +22,7 @@ class Board:
         for row in reader:
             # Keyword access to data.
             row = {value: row[i] for value, i in zip(values, order)}
-            # Check the spaceType of space.
+            # Establish the type of space.
             space = None
             t = row["type"].lower()
             if t == "property":
