@@ -3,12 +3,14 @@ from random import shuffle, randint
 from io import StringIO
 
 class Board:
+    """
+    Represents a gameboard. Contains `Space`, `Card` and `Group` objects.
+    """
     def __init__(self, filepath="./boards/UK.board"):
-        # Loads spaces from board CSV.
+        # Load spaces from board CSV.
         self.spaces = []
         self.groups = {}
         spaces = []
-
 
         with open(filepath, 'r') as boardfile:
             splitBoard = boardfile.read().split('&')
@@ -19,16 +21,16 @@ class Board:
         reader = csvreader(spacesCSV)
         header = [*map(str.lower, next(reader))]
 
-        # Expected values: name, type, set.
+        # Expected values: name, type, set, price, rent, building price.
         values = ("name", "type", "set", "price", "rent", "buildingprice")
         order = [header.index(s) for s in values]
         for row in reader:
-            #print(f"DEBUG: {row=}")
-            # Keyword access to data.
+            # Dictionary access to data.
+            # This allows CSV columns to be in any order.
             row = {value: row[i] for value, i in zip(values, order)}
             t = row["type"].lower()
 
-            # If space is property then create group if it doesn't exist for space's set.
+            # Load the space into the board.
             space = None
 
             if t in ("site", "station", "utility"):
@@ -36,24 +38,31 @@ class Board:
                 # Check if group exists for space's set.
                 if row["set"] not in self.groups:
                     # Create the group.
-                    #print(f"DEBUG: creating group {row['set']}")
                     self.groups[row["set"]] = Group(row["set"])
+
+                group = self.groups[row["set"]]
                 
                 # Load space data into specific Property subclass.
 
+                loader = lambda obj, **kwargs: obj(
+                    row["name"],
+                    group,
+                    row["price"],
+                    [int(x) for x in row["rent"].split('/')],
+                    **kwargs
+                )
+
                 if t == "site":
-                    space = Site(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')], buildingPrice = row["buildingprice"])
+                    space = loader(Site, buildingPrice=row["buildingprice"])
                 elif t == "station":
-                    space = Station(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')])
+                    space = loader(Station)
                 elif t == "utility":
-                    space = Utility(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')])
+                    space = loader(Utility)
 
                 # Put the space into the group.
-                #print('appending', space, 'to', row["set"])
-                self.groups[row["set"]].sites.append(space)
-                #print(self.groups[row["set"]].name)
-                
+                group += space
 
+            # Space is not property.
             elif t == "special":
                 space = Special(row["name"])
             elif t == "cardspace":
@@ -61,11 +70,8 @@ class Board:
             else:
                 raise Exception(f"'{t}' is an invalid type! ({filepath})")
             
-
-
             # Add the space to the board.
             spaces.append(space)
-
 
         self.spaces = spaces
         self.size = len(self.spaces)
@@ -82,6 +88,9 @@ class Board:
             self.chests.append(Card(i.split(',')[0],i.split(',')[1]))
         shuffle(self.chests)
 
+    def __repr__(self):
+        return f"<Board {len(self.spaces)} spaces ({len(self.groups)} groups)>"
+
     def drawChance(self, player):
         self.chances[0].actFunction(player)
         card = self.chances[0]
@@ -96,6 +105,9 @@ class Board:
 
 
 class Card:
+    """
+    Represents a card. Has an effect on `Player` objects.
+    """
     def __init__(self, message, function):
         self.message = message
         self.function = function
@@ -120,7 +132,11 @@ class Card:
                 # Out of jail
                 pass
 
+
 class Space:
+    """
+    Base class for all spaces in a `Board`.
+    """
     spaceType = None
     name = ''
 
@@ -129,12 +145,15 @@ class Space:
 
 
 class Property(Space):
+    """
+    Base class for all property spaces.
+    """
     spaceType = "property"
     propertyType = None
 
     def __init__(self, name, group, price, rent):
         self.name = name
-        self.group = group
+        self.group = group # Group object
         self.owner = None
         self.price = int(price)
         self.rents = []
@@ -144,6 +163,9 @@ class Property(Space):
 
 
 class Site(Property):
+    """
+    A `Property` subclass. This space can have houses.
+    """
     propertyType = 'site'
 
     def __init__(self, *args, buildingPrice):
@@ -151,23 +173,30 @@ class Site(Property):
         self.houses = 0
         self.buildingPrice = buildingPrice
         
-
     def calcRent(self, client):
         pass
 
 
 class Utility(Property):
+    """
+    A `Property` subclass. Represents a utility space.
+    """
     propertyType = 'utility'
     def calcRent(self, client):
         pass
 
 
 class Station(Property):
+    """
+    A `Property` subclass. Represents a station space.
+    """
     propertyType = 'station'
-    
 
 
 class CardSpace(Space):
+    """
+    A `Space` subclass. Draws a `Card` object affecting `Player` objects.
+    """
     def __init__(self, name, cardType):
         self.name = name
         self.cardType = cardType
@@ -175,28 +204,37 @@ class CardSpace(Space):
 
 
 class Special(Space):
+    """
+    A `Space` subclass. These spaces are special :)
+    """
     def __init__(self, name):
         self.name = name
 
 
 class Group:
-    def __init__(self, name, sites=[]):
+    """
+    A container for `Property` objects.
+    """
+    def __init__(self, name):
         self.name = name
-        self.sites = sites # List of Site objects
+        self.props = [] 
 
-    def __iadd__(self, other):
+    def __add__(self, other):
         if issubclass(type(other), Property):
-            self.sites.append(other)
+            self.props.append(other)
             return self
         else:
             raise TypeError("Can't add non-property objects.")
 
     def __repr__(self):
-        return f"<Group {len(self.sites)}>"
+        return f"<Group '{self.name}' {len(self.props)} props>"
 
 
 
 class Player:
+    """
+    Represents a player of the game.
+    """
     def __init__(self):
         self.position = 0
         self.inJail = False
@@ -248,7 +286,6 @@ class Player:
         if self.position > position and collectGo:
             self.passGo()
         self.position = position
-
 
     def rollDice(self):
         dice1 = randint(1, 6)
