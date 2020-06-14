@@ -11,7 +11,7 @@ class Board:
             splitBoard = boardfile.read().split('&')
             spacesCSV = StringIO(splitBoard[0])
             chances = splitBoard[1].split('\n')[:-1]
-            chest = splitBoard[2].split('\n')[:-1]
+            chests = splitBoard[2].split('\n')[:-1]
 
         reader = csvreader(spacesCSV)
         header = [*map(str.lower, next(reader))]
@@ -29,6 +29,8 @@ class Board:
                 space = Property(row["name"], row["set"])
             elif t == "special":
                 space = Special(row["name"])
+            elif t == "cardspace":
+                space = CardSpace(row["name"], row["set"])
             else:
                 raise Exception(f"'{t}' is an invalid type! ({filepath})")
 
@@ -42,14 +44,22 @@ class Board:
             self.chances.append(Card(i.split(',')[0],i.split(',')[1]))
         shuffle(self.chances)
 
-        self.chest = []
-        for i in chest:
-            self.chest.append(Card(i.split(',')[0],i.split(',')[1]))
-        shuffle(self.chest)
+        self.chests = []
+        for i in chests:
+            self.chests.append(Card(i.split(',')[0],i.split(',')[1]))
+        shuffle(self.chests)
 
     def drawChance(self, player):
         self.chances[0].actFunction(player)
-        self.chances.append(lst.pop(0))
+        card = self.chances[0]
+        self.chances.append(self.chances.pop(0))
+        return card
+
+    def drawChest(self, player):
+        self.chests[0].actFunction(player)
+        card = self.chests[0]
+        self.chests.append(self.chests.pop(0))
+        return card
 
 
 class Card:
@@ -59,14 +69,14 @@ class Card:
     def __repr__(self):
         return self.message + ' ' + self.function
     def actFunction(self, player):
-        if '|' in function:
-            if function.split('|')[0] == "Money":
-                player.money+=int(function.split('|')[1])
-            elif function.split('|')[0] == "Move":
-                player.move(int(function.split('|')[1]))
-            elif function.split('|')[0] == "Directly":
-                player.moveDirectly(int(function.split('|')[1]),True)
-            elif function.split('|')[0] == "EachPlayer":
+        if '|' in self.function:
+            if self.function.split('|')[0] == "Money":
+                player.money+=int(self.function.split('|')[1])
+            elif self.function.split('|')[0] == "Move":
+                player.move(int(self.function.split('|')[1]))
+            elif self.function.split('|')[0] == "Directly":
+                player.moveDirectly(int(self.function.split('|')[1]),True)
+            elif self.function.split('|')[0] == "EachPlayer":
                 #get money from each player
                 pass
         else:
@@ -79,16 +89,23 @@ class Card:
 
 class Space:
     name = ''
+    type = "special"
 
 
 class Property(Space):
     def __init__(self, name, colour):
         self.name = name
         self.set = colour
+        self.type = "property"
 
     def __repr__(self):
         return f"<Property '{self.name}'>"
 
+class CardSpace(Space):
+    def __init__(self,name,card):
+        self.name = name
+        self.card = card
+        self.type = "card_space"
 
 class Special(Space):
     def __init__(self, name):
@@ -103,7 +120,7 @@ class Player:
         self.position = 0
         self.inJail = False
         self.doubleCounter = 0
-        self.money = 0
+        self.money = 1500
 
     def getSpace(self, board):
         return board.spaces[self.position]

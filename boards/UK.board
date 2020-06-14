@@ -1,12 +1,12 @@
 Name,Type,Set
 Go,Special,None
 Old Kent Road,Property,Brown
-Community Chest,Special,Chest
+Community Chest,CardSpace,Chest
 Whitechapel Road,Property,Brown
 Income Tax,Special,Tax
 King's Cross Station,Special,Station
 "The Angel, Islington",Property,Light blue
-Chance,Special,Chance
+Chance,CardSpace,Chance
 Euston Road,Property,Light blue
 Pentonville Road,Property,Light blue
 Jail,Special,None
@@ -16,12 +16,12 @@ Whitehall,Property,Pink
 Northumberland Avenue,Property,Pink
 Marylebone Station,Special,Station
 Bow Street,Property,Orange
-Community Chest,Special,Chest
+Community Chest,CardSpace,Chest
 Marlborough Street,Property,Orange
 Vine Street,Property,Orange
 Free Parking,Special,None
 Strand,Property,Red
-Chance,Special,Chance
+Chance,CardSpace,Chance
 Fleet Street,Property,Red
 Trafalgar Square,Property,Red
 Fenchurch Street Station,Special,Station
@@ -32,10 +32,10 @@ Piccadilly,Property,Yellow
 Go To Jail,Special,None
 Regent Street,Property,Green
 Oxford Street,Property,Green
-Community Chest,Special,Chest
+Community Chest,CardSpace,Chest
 Bond Street,Property,Green
 Liverpool Street Station,Special,Station
-Chance,Special,Chance
+Chance,CardSpace,Chance
 Park Lane,Property,Dark blue
 Super Tax,Special,Tax
 Mayfair,Property,Dark blue

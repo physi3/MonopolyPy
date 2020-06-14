@@ -5,5 +5,17 @@ player = classes.Player()
 
 for i in range(100):
     player.turn(board)
-    print(board.spaces[player.position])
+    space = player.getSpace(board)
+    print(space.type)
+    print(space.name)
+    if space.type == "card_space":
+        if space.card == "Chance":
+            print("take a chance")
+            card = board.drawChance(player)
+            print(card.message)
+        if space.card == "Chest":
+            print("take a chest")
+            card = board.drawChest(player)
+            print(card.message)
+
     input()
