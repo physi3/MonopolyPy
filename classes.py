@@ -5,7 +5,10 @@ from io import StringIO
 class Board:
     def __init__(self, filepath="./boards/UK.board"):
         # Loads spaces from board CSV.
+        self.spaces = []
+        self.groups = {}
         spaces = []
+
 
         with open(filepath, 'r') as boardfile:
             splitBoard = boardfile.read().split('&')
@@ -17,27 +20,57 @@ class Board:
         header = [*map(str.lower, next(reader))]
 
         # Expected values: name, type, set.
-        values = ("name", "type", "set", "price")
+        values = ("name", "type", "set", "price", "rent", "buildingprice")
         order = [header.index(s) for s in values]
         for row in reader:
+            #print(f"DEBUG: {row=}")
             # Keyword access to data.
             row = {value: row[i] for value, i in zip(values, order)}
-            # Establish the type of space.
-            space = None
             t = row["type"].lower()
-            if t == "property":
-                space = Property(row["name"], row["set"], int(row["price"]))
+
+            # If space is property then create group if it doesn't exist for space's set.
+            space = None
+
+            if t in ("site", "station", "utility"):
+                # Space is a property.
+                # Check if group exists for space's set.
+                if row["set"] not in self.groups:
+                    # Create the group.
+                    #print(f"DEBUG: creating group {row['set']}")
+                    self.groups[row["set"]] = Group(row["set"])
+                
+                # Load space data into specific Property subclass.
+
+                if t == "site":
+                    space = Site(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')], buildingPrice = row["buildingprice"])
+                elif t == "station":
+                    space = Station(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')])
+                elif t == "utility":
+                    space = Utility(row["name"], self.groups[row["set"]], row["price"], [int(x) for x in row["rent"].split('/')])
+
+                # Put the space into the group.
+                #print('appending', space, 'to', row["set"])
+                self.groups[row["set"]].sites.append(space)
+                #print(self.groups[row["set"]].name)
+                
+
             elif t == "special":
                 space = Special(row["name"])
             elif t == "cardspace":
                 space = CardSpace(row["name"], row["set"])
             else:
                 raise Exception(f"'{t}' is an invalid type! ({filepath})")
+            
+
 
             # Add the space to the board.
             spaces.append(space)
+
+
         self.spaces = spaces
         self.size = len(self.spaces)
+
+        # Spaces have been loaded!
 
         self.chances = []
         for i in chances:
@@ -88,31 +121,78 @@ class Card:
                 pass
 
 class Space:
+    spaceType = None
     name = ''
-    spaceType = "special"
 
     def __repr__(self):
         return f"<Space {self.spaceType=} {self.name=}>"
 
+
 class Property(Space):
-    def __init__(self, name, colour, price):
+    spaceType = "property"
+    propertyType = None
+
+    def __init__(self, name, group, price, rent):
         self.name = name
-        self.set = colour
-        self.spaceType = "property"
+        self.group = group
         self.owner = None
-        self.price = price
+        self.price = int(price)
+        self.rents = []
+
+    def calcRent(self, client):
+        return self.price
+
+
+class Site(Property):
+    propertyType = 'site'
+
+    def __init__(self, *args, buildingPrice):
+        super().__init__(*args)
+        self.houses = 0
+        self.buildingPrice = buildingPrice
+        
+
+    def calcRent(self, client):
+        pass
+
+
+class Utility(Property):
+    propertyType = 'utility'
+    def calcRent(self, client):
+        pass
+
+
+class Station(Property):
+    propertyType = 'station'
+    
 
 
 class CardSpace(Space):
-    def __init__(self,name,card):
+    def __init__(self, name, cardType):
         self.name = name
-        self.card = card
+        self.cardType = cardType
         self.spaceType = "card_space"
 
 
 class Special(Space):
     def __init__(self, name):
         self.name = name
+
+
+class Group:
+    def __init__(self, name, sites=[]):
+        self.name = name
+        self.sites = sites # List of Site objects
+
+    def __iadd__(self, other):
+        if issubclass(type(other), Property):
+            self.sites.append(other)
+            return self
+        else:
+            raise TypeError("Can't add non-property objects.")
+
+    def __repr__(self):
+        return f"<Group {len(self.sites)}>"
 
 
 
@@ -123,7 +203,11 @@ class Player:
         self.doubleCounter = 0
         self.balance = 1500
         self.properties = set()
+        self.diceRoll = 0
 
+    def checkForColourSet(self):
+        pass
+        
     def getCurrentSpace(self, board):
         return board.spaces[self.position]
 
@@ -174,6 +258,5 @@ class Player:
         return dice1 + dice2
 
     def turn(self, board):
-        diceRoll = self.rollDice()
-        self.move(board, diceRoll)
-        return diceRoll
+        self.diceRoll = self.rollDice()
+        self.move(board, self.diceRoll)

@@ -5,7 +5,7 @@ class Game:
         self.players = [classes.Player() for _ in range(playerCount)]
         self.board = classes.Board(boardFilePath)
     def turn(self,playerIndex):
-        # rollDice
+        self.players[playerIndex].turn()
         # display new space
         # give options
         # if money due, pay Rent
