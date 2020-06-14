@@ -105,6 +105,9 @@ class Player:
         self.doubleCounter = 0
         self.money = 0
 
+    def getSpace(self, board):
+        return board.spaces[self.position]
+
     def passGo(self):
         self.money += 200
 
