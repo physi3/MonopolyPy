@@ -80,10 +80,10 @@ class Card:
                 # Get money from each player.
                 pass
         else:
-            if function == "Jail":
+            if self.function == "Jail":
                 # Go to jail
                 pass
-            elif function == "JailFree":
+            elif self.function == "JailFree":
                 # Out of jail
                 pass
 
@@ -121,13 +121,36 @@ class Player:
         self.position = 0
         self.inJail = False
         self.doubleCounter = 0
-        self.money = 1500
+        self.balance = 1500
+        self.properties = set()
 
-    def getSpace(self, board):
+    def getCurrentSpace(self, board):
         return board.spaces[self.position]
 
+    def addProperty(self, prop):
+        # Make player the owner of given property.
+        prop.owner = self
+        self.properties.add(prop)
+        return prop
+
+    def removeProperty(self, prop):
+        # Remove a property from player's ownership.
+        prop.owner = None
+        self.properties.discard(prop)
+        return prop
+
+    def buyProperty(self, prop):
+        # Check if space is owned.
+        if prop.owner:
+            return False
+        # Check that player has enough money.
+        if self.balance < prop.price:
+            return False
+        # Make player the owner of property.
+        return self.addProperty(prop)
+
     def passGo(self):
-        self.money += 200
+        self.balance += 200
 
     def move(self, board, displacement):
         self.position += displacement
