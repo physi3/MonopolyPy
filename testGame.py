@@ -6,9 +6,9 @@ player = classes.Player()
 for i in range(100):
     player.turn(board)
     space = player.getSpace(board)
-    print(space.type)
+    print(space.spaceType)
     print(space.name)
-    if space.type == "card_space":
+    if space.spaceType == "card_space":
         if space.card == "Chance":
             print("take a chance")
             card = board.drawChance(player)

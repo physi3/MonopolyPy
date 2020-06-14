@@ -17,16 +17,16 @@ class Board:
         header = [*map(str.lower, next(reader))]
 
         # Expected values: name, type, set.
-        values = ("name", "type", "set")
+        values = ("name", "type", "set", "price")
         order = [header.index(s) for s in values]
         for row in reader:
             # Keyword access to data.
             row = {value: row[i] for value, i in zip(values, order)}
-            # Check the type of space.
+            # Check the spaceType of space.
             space = None
             t = row["type"].lower()
             if t == "property":
-                space = Property(row["name"], row["set"])
+                space = Property(row["name"], row["set"], int(row["price"]))
             elif t == "special":
                 space = Special(row["name"])
             elif t == "cardspace":
@@ -77,42 +77,43 @@ class Card:
             elif self.function.split('|')[0] == "Directly":
                 player.moveDirectly(int(self.function.split('|')[1]),True)
             elif self.function.split('|')[0] == "EachPlayer":
-                #get money from each player
+                # Get money from each player.
                 pass
         else:
             if function == "Jail":
-                #go to jail
+                # Go to jail
                 pass
             elif function == "JailFree":
-                #getttoyu jail
+                # Out of jail
                 pass
 
 class Space:
     name = ''
-    type = "special"
-
-
-class Property(Space):
-    def __init__(self, name, colour):
-        self.name = name
-        self.set = colour
-        self.type = "property"
+    spaceType = "special"
 
     def __repr__(self):
-        return f"<Property '{self.name}'>"
+        return f"<Space {self.spaceType=} {self.name=}>"
+
+class Property(Space):
+    def __init__(self, name, colour, price):
+        self.name = name
+        self.set = colour
+        self.spaceType = "property"
+        self.owner = None
+        self.price = price
+
 
 class CardSpace(Space):
     def __init__(self,name,card):
         self.name = name
         self.card = card
-        self.type = "card_space"
+        self.spaceType = "card_space"
+
 
 class Special(Space):
     def __init__(self, name):
         self.name = name
 
-    def __repr__(self):
-        return f"<Special '{self.name}'>"
 
 
 class Player:
