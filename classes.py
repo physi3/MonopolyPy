@@ -176,4 +176,4 @@ class Player:
     def turn(self, board):
         diceRoll = self.rollDice()
         self.move(board, diceRoll)
-        print(diceRoll)
+        return diceRoll
