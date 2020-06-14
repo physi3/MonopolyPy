@@ -5,7 +5,7 @@ player = classes.Player()
 
 for i in range(100):
     player.turn(board)
-    space = player.getSpace(board)
+    space = player.getCurrentSpace(board)
     print(space.spaceType)
     print(space.name)
     if space.spaceType == "card_space":
