@@ -10,8 +10,8 @@ class Board:
         with open(filepath, 'r') as boardfile:
             splitBoard = boardfile.read().split('&')
             spacesCSV = StringIO(splitBoard[0])
-            chances = splitBoard[1].split("\n")[:-1]
-            community = splitBoard[2].split("\n")[:-1]
+            chances = splitBoard[1].split('\n')[:-1]
+            community = splitBoard[2].split('\n')[:-1]
 
         reader = csvreader(spacesCSV)
         header = [*map(str.lower, next(reader))]
@@ -39,11 +39,11 @@ class Board:
 
         self.chances = []
         for i in chances:
-            self.chances.append(Card(i.split(",")[0],i.split(",")[1]))
+            self.chances.append(Card(i.split(',')[0],i.split(',')[1]))
 
         self.community = []
         for i in community:
-            self.community.append(Card(i.split(",")[0],i.split(",")[1]))
+            self.community.append(Card(i.split(',')[0],i.split(',')[1]))
 
 
 class Card:
@@ -51,16 +51,16 @@ class Card:
         self.message = message
         self.function = function
     def __repr__(self):
-        return self.message+" "+self.function
+        return self.message + ' ' + self.function
     def actFunction(self, player):
-        if "|" in function:
-            if function.split("|")[0] == "Money":
-                player.money+=int(function.split("|")[1])
-            elif function.split("|")[0] == "Move":
-                player.move(int(function.split("|")[1]))
-            elif function.split("|")[0] == "Directly":
-                player.moveDirectly(int(function.split("|")[1]),True)
-            elif function.split("|")[0] == "EachPlayer":
+        if '|' in function:
+            if function.split('|')[0] == "Money":
+                player.money+=int(function.split('|')[1])
+            elif function.split('|')[0] == "Move":
+                player.move(int(function.split('|')[1]))
+            elif function.split('|')[0] == "Directly":
+                player.moveDirectly(int(function.split('|')[1]),True)
+            elif function.split('|')[0] == "EachPlayer":
                 #get money from each player
                 pass
         else:
@@ -100,7 +100,7 @@ class Player:
         self.money = 0
 
     def passGo(self):
-        self.money+=200
+        self.money += 200
 
     def move(self, board, displacement):
         self.position += displacement
@@ -117,13 +117,13 @@ class Player:
 
 
     def rollDice(self):
-        dice1 = randint(1,6)
-        dice2 = randint(1,6)
+        dice1 = randint(1, 6)
+        dice2 = randint(1, 6)
         if dice1 == dice2:
-            self.doubleCounter+=1
-        return dice1+dice2
+            self.doubleCounter += 1
+        return dice1 + dice2
 
     def turn(self, board):
         diceRoll = self.rollDice()
-        self.move(board,diceRoll)
+        self.move(board, diceRoll)
         print(diceRoll)
