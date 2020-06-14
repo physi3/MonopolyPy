@@ -11,7 +11,7 @@ class Board:
             splitBoard = boardfile.read().split('&')
             spacesCSV = StringIO(splitBoard[0])
             chances = splitBoard[1].split('\n')[:-1]
-            community = splitBoard[2].split('\n')[:-1]
+            chest = splitBoard[2].split('\n')[:-1]
 
         reader = csvreader(spacesCSV)
         header = [*map(str.lower, next(reader))]
@@ -42,10 +42,14 @@ class Board:
             self.chances.append(Card(i.split(',')[0],i.split(',')[1]))
         shuffle(self.chances)
 
-        self.community = []
-        for i in community:
-            self.community.append(Card(i.split(',')[0],i.split(',')[1]))
-        shuffle(self.community)
+        self.chest = []
+        for i in chest:
+            self.chest.append(Card(i.split(',')[0],i.split(',')[1]))
+        shuffle(self.chest)
+
+    def drawChance(self, player):
+        self.chances[0].actFunction(player)
+        self.chances.append(lst.pop(0))
 
 
 class Card:
