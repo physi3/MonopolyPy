@@ -1,10 +1,11 @@
 import classes
 
 class Game:
-    def __init__(self, playerCount,boardFilePath="./boards/UK.board"):
+    def __init__(self, playerCount, boardFilePath="./boards/UK.board"):
         self.players = [classes.Player() for _ in range(playerCount)]
         self.board = classes.Board(boardFilePath)
-    def createOptions(self,player):
+
+    def createOptions(self, player):
         space = player.getCurrentSpace(self.board)
         optionMessages = []
         options = []
@@ -32,9 +33,16 @@ class Game:
         player.turn(self.board)
         space = player.getCurrentSpace(self.board)
         if space.spaceType == "property":
-            print(f"You rolled a {player.diceRoll} and landed on {space.name}, {space.group.name}\n")
+            print("You rolled a {} and landed on {}, {}\n".format(
+                player.diceRoll,
+                space.name,
+                space.group.name
+            ))
         else:
-            print(f"You rolled a {player.diceRoll} and landed on {space.name}\n")
+            print("You rolled a {} and landed on {}\n".format(
+                player.diceRoll,
+                space.name
+            ))
 
         if space.spaceType == "tax":
             player.balance -= space.tax
@@ -53,7 +61,10 @@ class Game:
                 rent = space.calcRent(player)
                 space.owner.balance+=rent
                 player.balance-=rent
-                print(f"{rent}M payed to player {self.players.index(space.owner)+1}.\n")
+                print("{}M payed to player {}.\n".format(
+                    rent,
+                    self.players.index(space.owner)+1
+                ))
 
         while True:
             options = self.createOptions(player)
@@ -61,7 +72,9 @@ class Game:
                 print(i+f" [{options[0].index(i)+1}]")
             chosenOpt = options[1][int(input("Please choose an option [>> "))-1]
             if chosenOpt == "Buy":
-                reply = player.purchaseProperty(player.getCurrentSpace(self.board))
+                reply = player.purchaseProperty(
+                    player.getCurrentSpace(self.board)
+                )
                 print()
                 print(reply)
             if chosenOpt == "End":

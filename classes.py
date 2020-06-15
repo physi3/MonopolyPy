@@ -3,11 +3,11 @@ from random import shuffle, randint
 from io import StringIO
 
 class Board:
-    """
-    Represents a gameboard. Contains `Space`, `Card` and `Group` objects.
+    """Represents a gameboard. Contains `Space`, `Card` and `Group`
+     objects.
     """
     def __init__(self, filepath="./boards/UK.board"):
-        # Load spaces from board CSV.
+        """Load spaces from given board file."""
         self.spaces = []
         self.groups = {}
         spaces = []
@@ -79,7 +79,7 @@ class Board:
         self.size = len(self.spaces)
 
         # Spaces have been loaded!
-
+                                                                               
         self.chances = []
         for i in chances:
             self.chances.append(Card(i.split(',')[0],i.split(',')[1]))
@@ -105,20 +105,21 @@ class Board:
         self.chests.append(self.chests.pop(0))
         return card
 
-    def findSpace(self,name):
+    def findSpace(self, name):
         for i in self.spaces:
             if i.name == name:
                 return self.spaces.index(i)
 
+
 class Card:
-    """
-    Represents a card. Has an effect on `Player` objects.
-    """
+    """Represents a card. Has an effect on `Player` objects."""
     def __init__(self, message, function):
         self.message = message
         self.function = function
+
     def __repr__(self):
         return self.message + ' ' + self.function
+
     def actFunction(self, player, board):
         if '|' in self.function:
             if self.function.split('|')[0] == "Money":
@@ -126,32 +127,32 @@ class Card:
             elif self.function.split('|')[0] == "Move":
                 player.move(int(self.function.split('|')[1]))
             elif self.function.split('|')[0] == "Directly":
-                player.moveDirectly(int(board.findSpace(self.function.split('|')[1])),True)
+                player.moveDirectly(int(board.findSpace(
+                    self.function.split('|')[1])),True
+                )
             elif self.function.split('|')[0] == "EachPlayer":
                 # Get money from each player.
                 pass
         else:
             if self.function == "Jail":
-                # Go to jail
+                # Go to jail.
                 pass
             elif self.function == "JailFree":
-                # Out of jail
+                # Out of jail.
                 pass
 
+
 class Space:
-    """
-    Base class for all spaces in a `Board`.
-    """
-    spaceType = None
+    """Base class for all spaces in a `Board`."""
     name = ''
+    spaceType = None
 
     def __repr__(self):
         return f"<Space {self.spaceType=} {self.name=}>"
 
+
 class Property(Space):
-    """
-    Base class for all property spaces.
-    """
+    """Base class for all property spaces."""
     spaceType = "property"
     propertyType = None
 
@@ -168,11 +169,10 @@ class Property(Space):
     def rentDue(self, client):
         return self.owner != None and self.owner != client
 
+
 class Site(Property):
-    """
-    A `Property` subclass. This space can have houses.
-    """
-    propertyType = 'site'
+    """A `Property` subclass. This space can have houses."""
+    propertyType = "site"
 
     def __init__(self, *args, buildingPrice):
         super().__init__(*args)
@@ -187,23 +187,23 @@ class Site(Property):
                 rent = self.rents[1 + self.houses]
         return rent
 
+
 class Utility(Property):
-    """
-    A `Property` subclass. Represents a utility space.
-    """
-    propertyType = 'utility'
+    """A `Property` subclass. Represents a utility space."""
+    propertyType = "utility"
 
     def calcRent(self, client):
-        return self.rents[0 + self.owner.hasFullGroup(self.group)] * client.diceRoll
+        return (self.rents[len(self.owner.getPropsFromGroup(self.group)) - 1]
+                * client.diceRoll)
+
 
 class Station(Property):
-    """
-    A `Property` subclass. Represents a station space.
-    """
-    propertyType = 'station'
+    """A `Property` subclass. Represents a station space."""
+    propertyType = "station"
 
     def calcRent(self, client):
         return self.rents[self.owner.hasFullGroup(self.group) - 1]
+
 
 class CardSpace(Space):
     """
@@ -214,26 +214,23 @@ class CardSpace(Space):
         self.cardType = cardType
         self.spaceType = "card_space"
 
+
 class Tax(Space):
-    """
-    A `Tax` subclass. Represents a tax space
-    """
+    """A `Tax` subclass. Represents a tax space"""
     def __init__(self, name, tax):
         self.name = name
         self.tax = tax
         self.spaceType = "tax"
 
+
 class Special(Space):
-    """
-    A `Space` subclass. These spaces are special :)
-    """
+    """A `Space` subclass. These spaces are special :)"""
     def __init__(self, name):
         self.name = name
 
+
 class Group:
-    """
-    A container for `Property` objects.
-    """
+    """A container for `Property` objects."""
     def __init__(self, name):
         self.name = name
         self.props = set()
@@ -250,9 +247,7 @@ class Group:
 
 
 class Player:
-    """
-    Represents a player of the game.
-    """
+    """Represents a player of the game."""
     def __init__(self):
         self.position = 0
         self.inJail = False
@@ -274,19 +269,19 @@ class Player:
             return "Property successfully purchased."
 
     def addProperty(self, prop):
-        # Make player the owner of given property.
+        """Make player the owner of given property."""
         prop.owner = self
         self.props.add(prop)
         return prop
 
     def removeProperty(self, prop):
-        # Remove a property from player's ownership.
+        """Remove a property from player's ownership."""
         prop.owner = None
         self.props.discard(prop)
         return prop
 
     def buyProperty(self, prop):
-        # Check if space is owned.
+        """Check if space is owned."""
         if prop.owner:
             return False
         # Check that player has enough money.
@@ -298,15 +293,17 @@ class Player:
     # Group Methods
 
     def hasFullGroup(self, group):
-        # Check if player has all properties in group.
+        """Check if player has all properties in group."""
         return group.props.issubset(self.props)
 
     def getPropsFromGroup(self, group):
-        # Return all properties owned by Player that are in given Group.
+        """Return all properties owned by Player that are in given 
+        Group.
+        """
         return [prop for prop in group.props if prop.owner == self]
 
     def getFullGroups(self):
-        # Return all full groups owned by Player.
+        """Return all full groups owned by Player."""
         fullGroups = []
         for prop in self.props:
             if prop.group not in fullGroups and self.hasFullGroup(prop.group):
