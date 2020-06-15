@@ -1,2 +1,2 @@
 # MonopolyPy
-__Joe__ is _stinky_.
+__Olly__ is still _stinky_.

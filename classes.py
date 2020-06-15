@@ -41,7 +41,7 @@ class Board:
                     self.groups[row["set"]] = Group(row["set"])
 
                 group = self.groups[row["set"]]
-                
+
                 # Load space data into specific Property subclass.
 
                 loader = lambda obj, **kwargs: obj(
@@ -63,13 +63,15 @@ class Board:
                 group += space
 
             # Space is not property.
+            elif t == "tax":
+                space = Tax(row["name"], int(row["price"]))
             elif t == "special":
                 space = Special(row["name"])
             elif t == "cardspace":
                 space = CardSpace(row["name"], row["set"])
             else:
                 raise Exception(f"'{t}' is an invalid type! ({filepath})")
-            
+
             # Add the space to the board.
             spaces.append(space)
 
@@ -156,11 +158,19 @@ class Property(Space):
         self.group = group # Group object
         self.owner = None
         self.price = int(price)
-        self.rents = []
+        self.rents = rent
 
     def calcRent(self, client):
         return self.price
 
+    def doesOwnerHaveFullOwnership(self):
+        return self.group.checkFullOwnership(self.owner)
+
+    def getOwnersOwnershipCount(self):
+        return self.group.getOwnershipCount(self.owner)
+
+    def rentDue(self, client):
+        return self.owner != None and self.owner != client
 
 class Site(Property):
     """
@@ -172,9 +182,14 @@ class Site(Property):
         super().__init__(*args)
         self.houses = 0
         self.buildingPrice = buildingPrice
-        
+
     def calcRent(self, client):
-        pass
+        rent = 0
+        if self.owner != None:
+            rent = self.rents[0]
+            if self.doesOwnerHaveFullOwnership():
+                rent = self.rents[1+self.houses]
+        return rent
 
 
 class Utility(Property):
@@ -182,8 +197,9 @@ class Utility(Property):
     A `Property` subclass. Represents a utility space.
     """
     propertyType = 'utility'
+
     def calcRent(self, client):
-        pass
+        return self.rents[0 + self.doesOwnerHaveFullOwnership()] * client.diceRoll
 
 
 class Station(Property):
@@ -191,6 +207,9 @@ class Station(Property):
     A `Property` subclass. Represents a station space.
     """
     propertyType = 'station'
+
+    def calcRent(self, client):
+        return self.rents[self.getOwnersOwnershipCount() - 1]
 
 
 class CardSpace(Space):
@@ -202,6 +221,14 @@ class CardSpace(Space):
         self.cardType = cardType
         self.spaceType = "card_space"
 
+class Tax(Space):
+    """
+    A `Tax` subclass. Represents a tax space
+    """
+    def __init__(self, name, tax):
+        self.name = name
+        self.tax = tax
+        self.spaceType = "tax"
 
 class Special(Space):
     """
@@ -217,7 +244,7 @@ class Group:
     """
     def __init__(self, name):
         self.name = name
-        self.props = [] 
+        self.props = []
 
     def __add__(self, other):
         if issubclass(type(other), Property):
@@ -229,7 +256,14 @@ class Group:
     def __repr__(self):
         return f"<Group '{self.name}' {len(self.props)} props>"
 
+    def checkFullOwnership(self, player): # Checks if player owns all properties in the group.
+        return self.getOwnershipCount(player) == len(self.props)
 
+    def getOwnershipCount(self, player):
+        ownership = 0;
+        for i in self.props:
+            ownership += i.owner == player
+        return ownership
 
 class Player:
     """
@@ -243,11 +277,18 @@ class Player:
         self.properties = set()
         self.diceRoll = 0
 
-    def checkForColourSet(self):
-        pass
-        
     def getCurrentSpace(self, board):
         return board.spaces[self.position]
+
+    def purchaseProperty(self,prop):
+        if prop.owner != None:
+            return "This property is already owned."
+        elif self.balance < prop.price:
+            return "You do not have enough money to purchase this property."
+        else:
+            self.balance -= prop.price
+            self.addProperty(prop)
+            return "Property successfull purchased."
 
     def addProperty(self, prop):
         # Make player the owner of given property.
@@ -292,6 +333,8 @@ class Player:
         dice2 = randint(1, 6)
         if dice1 == dice2:
             self.doubleCounter += 1
+        else:
+            self.doubleCounter = 0
         return dice1 + dice2
 
     def turn(self, board):
