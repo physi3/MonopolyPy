@@ -338,3 +338,10 @@ class Player:
     def turn(self, board):
         self.diceRoll = self.rollDice()
         self.move(board, self.diceRoll)
+
+    def getFullSets(self):
+        fullSets = []
+        for i in self.props:
+            if (i.group not in fullSets) and (i.doesOwnerHaveFullOwnership(self)):
+                fullSets.append(i.group)
+        return fullSets

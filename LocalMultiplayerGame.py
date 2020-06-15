@@ -13,6 +13,9 @@ class Game:
                 optionMessages.append(f"Buy {space.name} for {space.price}M")
                 options.append("Buy")
 
+        if len(player.getFullSets) > 0:
+            optionMessages.append("Add houses or hotels to your properties")
+            options.append("Add_Building")
         optionMessages.append("Display balance")
         options.append("Disp_Balance")
 
