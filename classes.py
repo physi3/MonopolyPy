@@ -105,6 +105,10 @@ class Board:
         self.chests.append(self.chests.pop(0))
         return card
 
+    def findSpace(self,name):
+        for i in self.spaces:
+            if i.name == name:
+                return self.spaces.index(i)
 
 class Card:
     """
@@ -115,14 +119,14 @@ class Card:
         self.function = function
     def __repr__(self):
         return self.message + ' ' + self.function
-    def actFunction(self, player):
+    def actFunction(self, player, board):
         if '|' in self.function:
             if self.function.split('|')[0] == "Money":
-                player.money+=int(self.function.split('|')[1])
+                player.balance+=int(self.function.split('|')[1])
             elif self.function.split('|')[0] == "Move":
                 player.move(int(self.function.split('|')[1]))
             elif self.function.split('|')[0] == "Directly":
-                player.moveDirectly(int(self.function.split('|')[1]),True)
+                player.moveDirectly(int(board.findSpace(self.function.split('|')[1])),True)
             elif self.function.split('|')[0] == "EachPlayer":
                 # Get money from each player.
                 pass
@@ -134,7 +138,6 @@ class Card:
                 # Out of jail
                 pass
 
-
 class Space:
     """
     Base class for all spaces in a `Board`.
@@ -144,7 +147,6 @@ class Space:
 
     def __repr__(self):
         return f"<Space {self.spaceType=} {self.name=}>"
-
 
 class Property(Space):
     """
@@ -191,7 +193,6 @@ class Site(Property):
                 rent = self.rents[1+self.houses]
         return rent
 
-
 class Utility(Property):
     """
     A `Property` subclass. Represents a utility space.
@@ -201,7 +202,6 @@ class Utility(Property):
     def calcRent(self, client):
         return self.rents[0 + self.doesOwnerHaveFullOwnership()] * client.diceRoll
 
-
 class Station(Property):
     """
     A `Property` subclass. Represents a station space.
@@ -210,7 +210,6 @@ class Station(Property):
 
     def calcRent(self, client):
         return self.rents[self.getOwnersOwnershipCount() - 1]
-
 
 class CardSpace(Space):
     """
@@ -236,7 +235,6 @@ class Special(Space):
     """
     def __init__(self, name):
         self.name = name
-
 
 class Group:
     """
@@ -307,7 +305,7 @@ class Player:
         if prop.owner:
             return False
         # Check that player has enough money.
-        if self.balance < prop.price:
+        if self.balance <= prop.price:
             return False
         # Make player the owner of property.
         return self.addProperty(prop)

@@ -25,21 +25,32 @@ class Game:
 
     def turn(self,player):
         playerIndex = self.players.index(player)
-        input(f"Player {playerIndex+1} ...\nPress enter to roll the dice.")
+        input(f"\nPlayer {playerIndex+1} ...\nPress enter to roll the dice.")
         player.turn(self.board)
         space = player.getCurrentSpace(self.board)
-        print(f"You rolled a {player.diceRoll} and landed on {space.name}")
+        if space.spaceType == "property":
+            print(f"You rolled a {player.diceRoll} and landed on {space.name}, {space.group.name}\n")
+        else:
+            print(f"You rolled a {player.diceRoll} and landed on {space.name}\n")
 
         if space.spaceType == "tax":
             player.balance -= space.tax
-            print(f"Charged for {space.tax} in tax.")
+            print(f"Charged for {space.tax} in tax.\n")
+
+        if space.spaceType == "card_space":
+            if space.cardType == "Chance":
+                print()
+                print(self.board.drawChance(player).message)
+            if space.cardType == "Chest":
+                print()
+                print(self.board.drawChest(player).message)
 
         if space.spaceType == "property":
             if space.rentDue(player):
                 rent = space.calcRent(player)
                 space.owner.balance+=rent
                 player.balance-=rent
-                print(f"{rent}M payed to player {self.players.index(space.owner)+1}.")
+                print(f"{rent}M payed to player {self.players.index(space.owner)+1}.\n")
 
         while True:
             options = self.createOptions(player)
@@ -48,13 +59,14 @@ class Game:
             chosenOpt = options[1][int(input("Please choose an option [>> "))-1]
             if chosenOpt == "Buy":
                 reply = player.purchaseProperty(player.getCurrentSpace(self.board))
+                print()
                 print(reply)
             if chosenOpt == "End":
                 break
             if chosenOpt == "Disp_Balance":
-                print(f"Your balance is currently {player.balance}M")
+                print(f"\nYour balance is currently {player.balance}M")
             if chosenOpt == "Disp_properties":
-                print("You currently own:")
+                print("\nYou currently own:")
                 for i in player.properties:
                     print(i.name)
 
@@ -67,3 +79,6 @@ class Game:
         while True:
             for i in self.players:
                 self.turn(i)
+
+g = Game(2)
+g.start()
