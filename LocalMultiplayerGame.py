@@ -13,7 +13,7 @@ class Game:
                 optionMessages.append(f"Buy {space.name} for {space.price}M")
                 options.append("Buy")
 
-        if len(player.getFullSets) > 0:
+        if len(player.getFullGroups()) > 0:
             optionMessages.append("Add houses or hotels to your properties")
             options.append("Add_Building")
         optionMessages.append("Display balance")
@@ -70,7 +70,7 @@ class Game:
                 print(f"\nYour balance is currently {player.balance}M")
             if chosenOpt == "Disp_properties":
                 print("\nYou currently own:")
-                for i in player.properties:
+                for i in player.props:
                     print(i.name)
                 print()
 

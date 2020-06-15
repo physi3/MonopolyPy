@@ -165,12 +165,6 @@ class Property(Space):
     def calcRent(self, client):
         return self.price
 
-    def doesOwnerHaveFullOwnership(self):
-        return self.group.checkFullOwnership(self.owner)
-
-    def getOwnersOwnershipCount(self):
-        return self.group.getOwnershipCount(self.owner)
-
     def rentDue(self, client):
         return self.owner != None and self.owner != client
 
@@ -189,8 +183,8 @@ class Site(Property):
         rent = 0
         if self.owner != None:
             rent = self.rents[0]
-            if self.doesOwnerHaveFullOwnership():
-                rent = self.rents[1+self.houses]
+            if self.owner.hasFullGroup(self.group):
+                rent = self.rents[1 + self.houses]
         return rent
 
 class Utility(Property):
@@ -200,7 +194,7 @@ class Utility(Property):
     propertyType = 'utility'
 
     def calcRent(self, client):
-        return self.rents[0 + self.doesOwnerHaveFullOwnership()] * client.diceRoll
+        return self.rents[0 + self.owner.hasFullGroup(self.group)] * client.diceRoll
 
 class Station(Property):
     """
@@ -209,7 +203,7 @@ class Station(Property):
     propertyType = 'station'
 
     def calcRent(self, client):
-        return self.rents[self.getOwnersOwnershipCount() - 1]
+        return self.rents[self.owner.hasFullGroup(self.group) - 1]
 
 class CardSpace(Space):
     """
@@ -242,11 +236,11 @@ class Group:
     """
     def __init__(self, name):
         self.name = name
-        self.props = []
+        self.props = set()
 
     def __add__(self, other):
         if issubclass(type(other), Property):
-            self.props.append(other)
+            self.props.add(other)
             return self
         else:
             raise TypeError("Can't add non-property objects.")
@@ -254,14 +248,6 @@ class Group:
     def __repr__(self):
         return f"<Group '{self.name}' {len(self.props)} props>"
 
-    def checkFullOwnership(self, player): # Checks if player owns all properties in the group.
-        return self.getOwnershipCount(player) == len(self.props)
-
-    def getOwnershipCount(self, player):
-        ownership = 0;
-        for i in self.props:
-            ownership += i.owner == player
-        return ownership
 
 class Player:
     """
@@ -272,11 +258,10 @@ class Player:
         self.inJail = False
         self.doubleCounter = 0
         self.balance = 1500
-        self.properties = set()
+        self.props = set()
         self.diceRoll = 0
 
-    def getCurrentSpace(self, board):
-        return board.spaces[self.position]
+    # Property Methods
 
     def purchaseProperty(self,prop):
         if prop.owner != None:
@@ -286,18 +271,18 @@ class Player:
         else:
             self.balance -= prop.price
             self.addProperty(prop)
-            return "Property successfull purchased."
+            return "Property successfully purchased."
 
     def addProperty(self, prop):
         # Make player the owner of given property.
         prop.owner = self
-        self.properties.add(prop)
+        self.props.add(prop)
         return prop
 
     def removeProperty(self, prop):
         # Remove a property from player's ownership.
         prop.owner = None
-        self.properties.discard(prop)
+        self.props.discard(prop)
         return prop
 
     def buyProperty(self, prop):
@@ -309,6 +294,30 @@ class Player:
             return False
         # Make player the owner of property.
         return self.addProperty(prop)
+
+    # Group Methods
+
+    def hasFullGroup(self, group):
+        # Check if player has all properties in group.
+        return group.props.issubset(self.props)
+
+    def getPropsFromGroup(self, group):
+        # Return all properties owned by Player that are in given Group.
+        return [prop for prop in group.props if prop.owner == self]
+
+    def getFullGroups(self):
+        # Return all full groups owned by Player.
+        fullGroups = []
+        for prop in self.props:
+            if prop.group not in fullGroups and self.hasFullGroup(prop.group):
+                fullGroups.append(prop.group)
+        return fullGroups
+
+
+    # Movement Methods
+
+    def getCurrentSpace(self, board):
+        return board.spaces[self.position]
 
     def passGo(self):
         self.balance += 200
@@ -338,10 +347,3 @@ class Player:
     def turn(self, board):
         self.diceRoll = self.rollDice()
         self.move(board, self.diceRoll)
-
-    def getFullSets(self):
-        fullSets = []
-        for i in self.props:
-            if (i.group not in fullSets) and (i.doesOwnerHaveFullOwnership(self)):
-                fullSets.append(i.group)
-        return fullSets
