@@ -94,13 +94,13 @@ class Board:
         return f"<Board {len(self.spaces)} spaces ({len(self.groups)} groups)>"
 
     def drawChance(self, player):
-        self.chances[0].actFunction(player)
+        self.chances[0].actFunction(player, self)
         card = self.chances[0]
         self.chances.append(self.chances.pop(0))
         return card
 
     def drawChest(self, player):
-        self.chests[0].actFunction(player)
+        self.chests[0].actFunction(player, self)
         card = self.chests[0]
         self.chests.append(self.chests.pop(0))
         return card

@@ -69,6 +69,7 @@ class Game:
                 print("\nYou currently own:")
                 for i in player.properties:
                     print(i.name)
+                print()
 
             # if on go to jail, go to jail
             # (give option to trade)
