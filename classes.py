@@ -148,7 +148,7 @@ class Space:
     spaceType = None
 
     def __repr__(self):
-        return f"<Space {self.spaceType=} {self.name=}>"
+        return f"<Space {self.spaceType} {self.name}>"
 
 
 class Property(Space):
